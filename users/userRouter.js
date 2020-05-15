@@ -5,10 +5,19 @@ const Posts = require("../posts/postDb.js");
 
 const router = express.Router();
 
+router.use((req,res,next) => {
+  console.log("-Processed by User Router-")
+  next();
+})
+
 router.post("/", validateUser, (req, res) => {
   // do your magic!
   Users.insert(req.body)
     .then((user) => {
+
+
+
+    
       res.status(201).json(user);
     })
     .catch((err) => {
@@ -20,7 +29,7 @@ router.post("/:id/posts", validateUserId, validatePost, (req, res) => {
   // do your magic!
 
   const newPost = { user_id: req.id, text: req.body.text };
-  Posts.insert(newPost)
+  Posts.insert(newPost)    
     .then((post) => {
       res.status(200).json(post);
     })
@@ -85,8 +94,20 @@ router.delete("/:id", validateUserId, (req, res) => {
     });
 });
 
-router.put("/:id", (req, res) => {
+router.put("/:id",validateUserId, (req, res) => {
   // do your magic!
+  if(req.body.name && req.body.id){
+    const updatedUser = { id: req.id , name: req.body.name }
+    Users.update(req.id , updatedUser)
+    .then(uptUser => {
+      res.status(200).json(req.body)
+    })
+  }else if(req.body.name){
+    res.status(404).json({errorMessage:"id missing"})
+  }else{
+    res.status(404).json({errorMessage:"name missing"})
+  }
+    
 });
 
 //custom middleware
@@ -138,5 +159,7 @@ function validatePost(req, res, next) {
     res.status(404).json({ errorMessage: "comment data (body) missing" });
   }
 }
+
+
 
 module.exports = router;
