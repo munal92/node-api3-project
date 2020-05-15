@@ -27,12 +27,31 @@ router.get('/:id',validatePostId ,(req, res) => {
  
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id',validatePostId ,(req, res) => {
   // do your magic!
+    Posts.remove(req.id)
+    .then(post => {
+      res.status(200).json(req.post)
+    }).catch(err => {
+      res.status(500).json({errorMessage:"Server Error"})
+    })
+
+
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', validatePostId,(req, res) => {
   // do your magic!
+  const updatedPost = {text: req.body.text , user_id: req.body.user_id}
+  Posts.update(req.id , updatedPost)
+  .then(post => {
+res.status(200).json(updatedPost);
+  }).catch(err => {
+    console.log(err);
+    res.status(500).json({errorMessage:"Server issue"})
+  })
+
+
+
 });
 
 // custom middleware
@@ -44,6 +63,7 @@ function validatePostId(req, res, next) {
   .then(post => {
     if(post){
         req.post = post;
+        req.id = id;
         next();
         
     }else{

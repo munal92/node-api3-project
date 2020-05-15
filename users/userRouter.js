@@ -14,6 +14,10 @@ router.post("/", validateUser, (req, res) => {
   // do your magic!
   Users.insert(req.body)
     .then((user) => {
+
+
+
+    
       res.status(201).json(user);
     })
     .catch((err) => {
@@ -25,7 +29,7 @@ router.post("/:id/posts", validateUserId, validatePost, (req, res) => {
   // do your magic!
 
   const newPost = { user_id: req.id, text: req.body.text };
-  Posts.insert(newPost)
+  Posts.insert(newPost)    
     .then((post) => {
       res.status(200).json(post);
     })
